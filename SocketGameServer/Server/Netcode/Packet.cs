@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SocketGameServer.Server
+namespace Server.Netcode
 {
 	public class Packet : IDisposable
 	{
@@ -11,30 +11,30 @@ namespace SocketGameServer.Server
 		private bool _bufferUpdated;
 
 		public Packet()
-		{ 
+		{
 			_buffer = new List<byte>();
 			_readPosition = 0;
 			_length = 0;
 		}
 
 		public int GetReadPos()
-		{ 
-			return _readPosition; 
+		{
+			return _readPosition;
 		}
-		
-		public byte[] ToArray() 
+
+		public byte[] ToArray()
 		{
 			return _buffer.ToArray();
 		}
 		public int Count()
-		{ 
-			return _buffer.Count(); 
+		{
+			return _buffer.Count();
 		}
-		public int LengthRemaining() 
+		public int LengthRemaining()
 		{
 			return Count() - _readPosition;
 		}
-			 
+
 		public void Clear()
 		{
 			_buffer.Clear();
@@ -42,7 +42,7 @@ namespace SocketGameServer.Server
 		}
 		public void WriteLength()
 		{
-			_buffer.InsertRange(0,BitConverter.GetBytes(_buffer.Count));
+			_buffer.InsertRange(0, BitConverter.GetBytes(_buffer.Count));
 		}
 
 		public void WriteByte(byte input)
@@ -55,12 +55,12 @@ namespace SocketGameServer.Server
 			_buffer.AddRange(input);
 			_bufferUpdated = true;
 		}
-		public void WriteShort(short value) 
-		{ 
+		public void WriteShort(short value)
+		{
 			_buffer.AddRange(BitConverter.GetBytes(value));
 			_bufferUpdated = true;
 		}
-		public void WriteInt(int value) 
+		public void WriteInt(int value)
 		{
 			_buffer.AddRange(BitConverter.GetBytes(value));
 			_bufferUpdated = true;
@@ -86,19 +86,19 @@ namespace SocketGameServer.Server
 			_buffer.AddRange(Encoding.ASCII.GetBytes(value));
 			_bufferUpdated = true;
 		}
-		public byte ReadByte(bool peek=true)
+		public byte ReadByte(bool peek = true)
 		{
 			if (_buffer.Count > _readPosition)
 			{
-				if(_bufferUpdated)
+				if (_bufferUpdated)
 				{
 					_readBuffer = _buffer.ToArray();
-					_bufferUpdated= false;
+					_bufferUpdated = false;
 				}
-				
+
 				byte value = _readBuffer[_readPosition];
 
-				if(peek & _buffer.Count > _readPosition)
+				if (peek & _buffer.Count > _readPosition)
 				{
 					_readPosition += 1;
 				}
@@ -110,7 +110,7 @@ namespace SocketGameServer.Server
 			}
 
 		}
-		public byte[] ReadBytes(int length,bool peek=true)
+		public byte[] ReadBytes(int length, bool peek = true)
 		{
 			if (_buffer.Count > _readPosition)
 			{
@@ -120,7 +120,7 @@ namespace SocketGameServer.Server
 					_bufferUpdated = false;
 				}
 
-				byte[] value = _buffer.GetRange(_readPosition,length).ToArray();
+				byte[] value = _buffer.GetRange(_readPosition, length).ToArray();
 
 				if (peek)
 				{
@@ -133,7 +133,7 @@ namespace SocketGameServer.Server
 				throw new Exception("You are not trying to read out a 'byte[]'");
 			}
 		}
-		public short ReadShort(bool peek= true)
+		public short ReadShort(bool peek = true)
 		{
 			if (_buffer.Count > _readPosition)
 			{
@@ -143,7 +143,7 @@ namespace SocketGameServer.Server
 					_bufferUpdated = false;
 				}
 
-				short value = BitConverter.ToInt16(_readBuffer,_readPosition);
+				short value = BitConverter.ToInt16(_readBuffer, _readPosition);
 
 				if (peek & _buffer.Count > _readPosition)
 				{
@@ -156,7 +156,7 @@ namespace SocketGameServer.Server
 				throw new Exception("You are trying to read out a 'short'");
 			}
 		}
-		public int ReadInt(bool peek= true)
+		public int ReadInt(bool peek = true)
 		{
 			if (_buffer.Count > _readPosition)
 			{
@@ -179,7 +179,7 @@ namespace SocketGameServer.Server
 				throw new Exception("You are trying to read out a 'int'");
 			}
 		}
-		public long ReadLong(bool peek= true)
+		public long ReadLong(bool peek = true)
 		{
 			if (_buffer.Count > _readPosition)
 			{
@@ -202,7 +202,7 @@ namespace SocketGameServer.Server
 				throw new Exception("You are trying to read out a 'long'");
 			}
 		}
-		public float ReadFloat(bool peek= true)
+		public float ReadFloat(bool peek = true)
 		{
 
 			if (_buffer.Count > _readPosition)
@@ -226,7 +226,7 @@ namespace SocketGameServer.Server
 				throw new Exception("You are trying to read out a 'float'");
 			}
 		}
-		public bool ReadBool(bool peek= true)
+		public bool ReadBool(bool peek = true)
 		{
 			if (_buffer.Count > _readPosition)
 			{
@@ -249,7 +249,7 @@ namespace SocketGameServer.Server
 				throw new Exception("You are trying to read out a 'bool'");
 			}
 		}
-		public string ReadString(bool peek= true)
+		public string ReadString(bool peek = true)
 		{
 			try
 			{
@@ -268,14 +268,16 @@ namespace SocketGameServer.Server
 				}
 				return value;
 			}
-			catch(Exception ex) {
-				throw new Exception("You are not trying to read 'string'");			
+			catch (Exception ex)
+			{
+				throw new Exception("You are not trying to read 'string'");
 			}
 		}
 
 		private bool _disposeValue = false;
-		protected virtual void Dispose(bool disposing) { 
-			if(!disposing)
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposing)
 			{
 				_buffer.Clear();
 				_readPosition = 0;
